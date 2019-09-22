@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  redis-server:
+    image: "redis"
+  api:
+    build: ./api
+    ports: 
+      - "8007:8007"
+  client-a:
+    build: ./client
+    environment:
+      - "PORT=3001"
+    ports:
+      - "3001:3001"
+    depends_on:
+      - api
+  client-b:
+    build: ./client
+    environment:
+      - "PORT=3002"
+    ports:
+      - "3002:3002"
+    depends_on:
+      - api
