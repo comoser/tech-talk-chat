@@ -7,10 +7,10 @@ services:
 
   api:
     build: ./api
-    ports: 
+    ports:
       - "8007:8007"
 
-  client-a:
+  client:
     build:
       context: ./client
       dockerfile: Dockerfile.dev
