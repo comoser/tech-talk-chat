@@ -1,14 +1,14 @@
 {
   "name": "api",
   "version": "1.0.0",
-  "description": "API for simple chat demo",
+  "description": "API for simple chat demo with redis history cache",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "keywords": [],
   "author": "David Alecrim",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",

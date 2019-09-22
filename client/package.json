@@ -1,7 +1,7 @@
 {
   "name": "chat-client",
   "version": "1.0.0",
-  "description": "Chat client consuming messages from redis",
+  "description": "Chat client consuming messages from an API",
   "main": "index.js",
   "scripts": {
     "dev": "next",

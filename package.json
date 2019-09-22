@@ -1,0 +1,6 @@
+{
+    "scripts": {
+        "dev": "docker-compose down && docker-compose -f docker-compose-dev.yml up --build",
+        "prod": "docker-compose down && docker-compose up -d --build"
+    }
+}

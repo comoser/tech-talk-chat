@@ -109,14 +109,36 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(socket_io_client__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var uuid_v1__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! uuid/v1 */ "uuid/v1");
 /* harmony import */ var uuid_v1__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(uuid_v1__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _hooks_chat_messages__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../hooks/chat_messages */ "./hooks/chat_messages.js");
-var _jsxFileName = "/Users/davidalecrim/Desktop/tech-talk/client/components/chat/chat_box.js";
+/* harmony import */ var styled_components__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! styled-components */ "styled-components");
+/* harmony import */ var styled_components__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(styled_components__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _hooks_chat_messages__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../hooks/chat_messages */ "./hooks/chat_messages.js");
+/* harmony import */ var _chat_item__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./chat_item */ "./components/chat/chat_item.js");
+/* harmony import */ var _chat_input__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./chat_input */ "./components/chat/chat_input.js");
+var _jsxFileName = "/app/client/components/chat/chat_box.js";
 var __jsx = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement;
 
 
 
 
+
+
+
+const ChatBoxWrapper = styled_components__WEBPACK_IMPORTED_MODULE_3___default.a.div`
+    position: fixed;
+    width: 375px;
+    height: 60vh;
+    border-radius: 5px;
+    border: 1px solid #f0f0f0;
+    top: 100px;
+    left: 50%;
+    transform: translate(-50%, 0);
+`;
+const Scroller = styled_components__WEBPACK_IMPORTED_MODULE_3___default.a.div`
+  overflow: scroll;
+  height: calc(100% - 40px);
+`;
 const ChatBox = () => {
+  let scrollerRef = null;
   const {
     0: uuid,
     1: setUuid
@@ -129,18 +151,26 @@ const ChatBox = () => {
     0: draftMessage,
     1: setDraftMessage
   } = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])('');
-  const [messages, addMessage] = Object(_hooks_chat_messages__WEBPACK_IMPORTED_MODULE_3__["default"])([]);
+  const [messages, addMessage] = Object(_hooks_chat_messages__WEBPACK_IMPORTED_MODULE_4__["default"])([]);
   const {
     0: messageHistory,
     1: setMessageHistory
   } = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])([]);
-  Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(async () => {
-    setSocket(socket_io_client__WEBPACK_IMPORTED_MODULE_1___default.a.connect("http://localhost:8007"));
-    setUuid(uuid_v1__WEBPACK_IMPORTED_MODULE_2___default()());
+
+  const fetchHistory = async () => {
     const response = await fetch(`${"http://localhost:8007"}/history`);
     const messagesJson = await response.json();
     setMessageHistory(messagesJson.response);
+  };
+
+  Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(() => {
+    setSocket(socket_io_client__WEBPACK_IMPORTED_MODULE_1___default.a.connect("http://localhost:8007"));
+    setUuid(uuid_v1__WEBPACK_IMPORTED_MODULE_2___default()());
+    fetchHistory();
   }, []);
+  Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(() => {
+    if (scrollerRef) scrollerRef.scrollTop = scrollerRef.scrollHeight;
+  });
 
   if (socket) {
     socket.on('CHAT_MESSAGE_RECEIVED', chatMessageContent => {
@@ -157,6 +187,11 @@ const ChatBox = () => {
       uuid,
       message: draftMessage
     });
+
+    if (scrollerRef) {
+      scrollerRef.scrollTop = scrollerRef.scrollHeight;
+      setDraftMessage('');
+    }
   };
 
   const sendMessageByKeyboard = e => {
@@ -165,57 +200,213 @@ const ChatBox = () => {
         uuid,
         message: draftMessage
       });
+
+      if (scrollerRef) {
+        scrollerRef.scrollTop = scrollerRef.scrollHeight;
+        setDraftMessage('');
+      }
     }
   };
 
-  return __jsx("div", {
+  const renderHistoryMessages = () => {
+    return messageHistory.map(messageWrapper => {
+      return __jsx(_chat_item__WEBPACK_IMPORTED_MODULE_5__["ChatItem"], {
+        key: messageWrapper.message,
+        uuid: uuid,
+        messageWrapper: messageWrapper,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 87
+        },
+        __self: undefined
+      });
+    });
+  };
+
+  const renderMessages = () => {
+    return messages.map(messageWrapper => {
+      return __jsx(_chat_item__WEBPACK_IMPORTED_MODULE_5__["ChatItem"], {
+        key: messageWrapper.message,
+        uuid: uuid,
+        messageWrapper: messageWrapper,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 99
+        },
+        __self: undefined
+      });
+    });
+  };
+
+  return __jsx(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, __jsx(ChatBoxWrapper, {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 49
+      lineNumber: 110
     },
     __self: undefined
-  }, __jsx("ul", {
+  }, __jsx(Scroller, {
+    ref: ref => scrollerRef = ref,
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 50
+      lineNumber: 111
     },
     __self: undefined
-  }, messageHistory.map(item => {
-    return __jsx("li", {
-      key: item.message,
-      __source: {
-        fileName: _jsxFileName,
-        lineNumber: 54
-      },
-      __self: undefined
-    }, item.uuid === uuid ? 'ME: ' : '', item.message);
-  }), messages.map(messageWrapper => {
-    return __jsx("li", {
-      key: messageWrapper.message,
-      __source: {
-        fileName: _jsxFileName,
-        lineNumber: 65
-      },
-      __self: undefined
-    }, messageWrapper.uuid === uuid ? 'ME: ' : '', messageWrapper.message);
-  })), __jsx("input", {
+  }, renderHistoryMessages(), renderMessages()), __jsx(_chat_input__WEBPACK_IMPORTED_MODULE_6__["ChatInput"], {
+    draftMessage: draftMessage,
+    onDraftMessageChange: onDraftMessageChange,
+    sendMessage: sendMessage,
+    sendMessageByKeyboard: sendMessageByKeyboard,
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 115
+    },
+    __self: undefined
+  })));
+};
+
+/***/ }),
+
+/***/ "./components/chat/chat_input.js":
+/*!***************************************!*\
+  !*** ./components/chat/chat_input.js ***!
+  \***************************************/
+/*! exports provided: ChatInput */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ChatInput", function() { return ChatInput; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var styled_components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! styled-components */ "styled-components");
+/* harmony import */ var styled_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(styled_components__WEBPACK_IMPORTED_MODULE_1__);
+var _jsxFileName = "/app/client/components/chat/chat_input.js";
+var __jsx = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement;
+
+
+const Wrapper = styled_components__WEBPACK_IMPORTED_MODULE_1___default.a.div`
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 40px;
+  display: flex;
+  flex-direction: row;
+  border-top: 1px solid #f0f0f0;
+`;
+const BigInput = styled_components__WEBPACK_IMPORTED_MODULE_1___default.a.input`
+  flex: 1;
+  margin: 0;
+  padding-left: 10px;
+  font-size: 110%;
+  border: 0 !important;
+  border-bottom-left-radius: 5px;
+  margin-left: 1px;
+  margin-bottom: 1px;
+`;
+const SubmitButton = styled_components__WEBPACK_IMPORTED_MODULE_1___default.a.button`
+  width: 70px;
+  background-color: #3832a8;
+  color: #fff;
+  font-size: 110%;
+  border-bottom-right-radius: 5px;
+`;
+const ChatInput = ({
+  draftMessage,
+  onDraftMessageChange,
+  sendMessageByKeyboard,
+  sendMessage
+}) => {
+  return __jsx(Wrapper, {
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 41
+    },
+    __self: undefined
+  }, __jsx(BigInput, {
     name: "draft-message",
     value: draftMessage,
     onChange: onDraftMessageChange,
     onKeyPress: sendMessageByKeyboard,
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 74
+      lineNumber: 42
     },
     __self: undefined
-  }), __jsx("button", {
+  }), __jsx(SubmitButton, {
     onClick: sendMessage,
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 80
+      lineNumber: 48
     },
     __self: undefined
-  }, "Send Message"));
+  }, "Send"));
+};
+
+/***/ }),
+
+/***/ "./components/chat/chat_item.js":
+/*!**************************************!*\
+  !*** ./components/chat/chat_item.js ***!
+  \**************************************/
+/*! exports provided: ChatItem */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ChatItem", function() { return ChatItem; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var styled_components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! styled-components */ "styled-components");
+/* harmony import */ var styled_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(styled_components__WEBPACK_IMPORTED_MODULE_1__);
+var _jsxFileName = "/app/client/components/chat/chat_item.js";
+var __jsx = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement;
+
+
+const Item = styled_components__WEBPACK_IMPORTED_MODULE_1___default.a.div`
+  position: relative;
+    padding: 10px 16px;
+    font-family: sans-serif;
+    &.self {
+      text-align: right;
+    }
+`;
+const Indicator = styled_components__WEBPACK_IMPORTED_MODULE_1___default.a.div`
+  position: absolute;
+  top: 50%;
+  height: 6px;
+  width: 6px;
+  border-radius: 50%;
+  background-color: #969696;
+  transform: translate(0, -50%);
+  &.other {
+    left: 5px;  
+  }
+  &.self {
+    right: 5px;
+    background-color: #5435ff;
+  }
+`;
+const ChatItem = ({
+  uuid,
+  messageWrapper
+}) => {
+  const selfMessage = messageWrapper.uuid === uuid;
+  return __jsx(Item, {
+    className: selfMessage ? 'self' : '',
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 34
+    },
+    __self: undefined
+  }, __jsx(Indicator, {
+    className: selfMessage ? 'self' : 'other',
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 35
+    },
+    __self: undefined
+  }), selfMessage ? 'ME: ' : '', messageWrapper.message);
 };
 
 /***/ }),
@@ -261,7 +452,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var styled_components__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! styled-components */ "styled-components");
 /* harmony import */ var styled_components__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(styled_components__WEBPACK_IMPORTED_MODULE_0__);
 
-const Main = styled_components__WEBPACK_IMPORTED_MODULE_0___default.a.main``;
+const Main = styled_components__WEBPACK_IMPORTED_MODULE_0___default.a.main`
+    padding-top: 80px;
+`;
 
 /***/ }),
 
@@ -279,7 +472,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var styled_components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! styled-components */ "styled-components");
 /* harmony import */ var styled_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(styled_components__WEBPACK_IMPORTED_MODULE_1__);
-var _jsxFileName = "/Users/davidalecrim/Desktop/tech-talk/client/components/navbar.js";
+var _jsxFileName = "/app/client/components/navbar.js";
 var __jsx = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement;
 
 
@@ -290,21 +483,23 @@ const NavbarWrapper = styled_components__WEBPACK_IMPORTED_MODULE_1___default.a.n
     top:0;
     right: 0;
     left: 0;
-    background-color: #fafafa;
+    background-color: #3832a8;
     justify-content: center;
     align-items: center;
+    color: #fff;
+    font-family: sans-serif;
 `;
 const Navbar = () => {
   return __jsx(NavbarWrapper, {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 18
+      lineNumber: 20
     },
     __self: undefined
   }, __jsx("h2", {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 19
+      lineNumber: 21
     },
     __self: undefined
   }, "Chat Demo"));
@@ -326,7 +521,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var styled_components__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(styled_components__WEBPACK_IMPORTED_MODULE_0__);
 
 const Section = styled_components__WEBPACK_IMPORTED_MODULE_0___default.a.section`
-    min-height: 100vh;
     min-width: 100vw;
     margin-top: 80px;
     padding: 60px;
@@ -378,7 +572,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var dotenv__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! dotenv */ "dotenv");
 /* harmony import */ var dotenv__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(dotenv__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _components__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../components */ "./components/index.js");
-var _jsxFileName = "/Users/davidalecrim/Desktop/tech-talk/client/pages/index.js";
+var _jsxFileName = "/app/client/pages/index.js";
 
 var __jsx = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement;
 
@@ -424,7 +618,7 @@ const Index = () => {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /Users/davidalecrim/Desktop/tech-talk/client/pages/index.js */"./pages/index.js");
+module.exports = __webpack_require__(/*! /app/client/pages/index.js */"./pages/index.js");
 
 
 /***/ }),

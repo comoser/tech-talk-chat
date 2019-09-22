@@ -8,9 +8,11 @@ const NavbarWrapper = styled.nav`
     top:0;
     right: 0;
     left: 0;
-    background-color: #fafafa;
+    background-color: #3832a8;
     justify-content: center;
     align-items: center;
+    color: #fff;
+    font-family: sans-serif;
 `;
 
 export const Navbar = () => {

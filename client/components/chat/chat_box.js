@@ -1,23 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import socketio from 'socket.io-client';
 import uuidLib from 'uuid/v1';
+import styled from 'styled-components';
 
 import useChatMessages from '../../hooks/chat_messages';
+import { ChatItem } from './chat_item';
+import { ChatInput } from './chat_input';
+
+const ChatBoxWrapper = styled.div`
+    position: fixed;
+    width: 375px;
+    height: 60vh;
+    border-radius: 5px;
+    border: 1px solid #f0f0f0;
+    top: 100px;
+    left: 50%;
+    transform: translate(-50%, 0);
+`;
+
+const Scroller = styled.div`
+  overflow: scroll;
+  height: calc(100% - 40px);
+`;
 
 export const ChatBox = () => {
+    let scrollerRef = null;
     const [uuid, setUuid] = useState(null);
     const [socket, setSocket] = useState(null);
     const [draftMessage, setDraftMessage] = useState('');
     const [messages, addMessage] = useChatMessages([]);
     const [messageHistory, setMessageHistory] = useState([]);
 
-    useEffect(async () => {
-        setSocket(socketio.connect(process.env.API_URL));
-        setUuid(uuidLib());
+    const fetchHistory = async () => {
         const response = await fetch(`${process.env.API_URL}/history`);
         const messagesJson = await response.json();
         setMessageHistory(messagesJson.response);
+    };
+
+    useEffect(() => {
+        setSocket(socketio.connect(process.env.API_URL));
+        setUuid(uuidLib());
+        fetchHistory();
     }, []);
+
+    useEffect(() => {
+        if (scrollerRef) scrollerRef.scrollTop = scrollerRef.scrollHeight;
+    });
 
     if (socket) {
         socket.on('CHAT_MESSAGE_RECEIVED', (chatMessageContent) => {
@@ -34,7 +62,11 @@ export const ChatBox = () => {
             uuid,
             message: draftMessage,
         });
-    }
+        if (scrollerRef) {
+            scrollerRef.scrollTop = scrollerRef.scrollHeight;
+            setDraftMessage('');
+        }
+    };
 
     const sendMessageByKeyboard = (e) => {
         if (e.which === 13) {
@@ -42,44 +74,51 @@ export const ChatBox = () => {
                 uuid,
                 message: draftMessage,
             });
+            if (scrollerRef) {
+                scrollerRef.scrollTop = scrollerRef.scrollHeight;
+                setDraftMessage('');
+            }
         }
-    }
+    };
+
+    const renderHistoryMessages = () => {
+        return messageHistory.map((messageWrapper) => {
+            return (
+                <ChatItem
+                    key={messageWrapper.message}
+                    uuid={uuid}
+                    messageWrapper={messageWrapper}
+                />
+            );
+        });
+    };
+
+    const renderMessages = () => {
+        return messages.map((messageWrapper) => {
+            return (
+                <ChatItem
+                    key={messageWrapper.message}
+                    uuid={uuid}
+                    messageWrapper={messageWrapper}
+                />
+            );
+        });
+    };
 
     return (
-        <div>
-            <ul>
-                {
-                    messageHistory.map((item) => {
-                        return (
-                            <li
-                                key={item.message}
-                            >
-                                {item.uuid === uuid ? 'ME: ':''}{item.message}
-                            </li>
-                        );
-                    })
-                }
-                {
-                    messages.map((messageWrapper) => {
-                        return (
-                            <li
-                                key={messageWrapper.message}
-                            >
-                                {messageWrapper.uuid === uuid ? 'ME: ' : ''}{messageWrapper.message}
-                            </li>
-                        );
-                    })
-                }
-            </ul>
-            <input
-                name="draft-message"
-                value={draftMessage}
-                onChange={onDraftMessageChange}
-                onKeyPress={sendMessageByKeyboard}
-            />
-            <button onClick={sendMessage}>
-                Send Message
-            </button>
-        </div>
+        <>
+            <ChatBoxWrapper>
+                <Scroller ref={ref => scrollerRef = ref}>
+                    {renderHistoryMessages()}
+                    {renderMessages()}
+                </Scroller>
+                <ChatInput
+                    draftMessage={draftMessage}
+                    onDraftMessageChange={onDraftMessageChange}
+                    sendMessage={sendMessage}
+                    sendMessageByKeyboard={sendMessageByKeyboard}
+                />
+            </ChatBoxWrapper>
+        </>
     );
 };

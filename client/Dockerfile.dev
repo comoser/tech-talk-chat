@@ -1,0 +1,13 @@
+FROM alpine
+
+WORKDIR /app/client
+
+RUN apk add nodejs npm
+
+COPY ./package.json ./
+
+RUN npm install
+
+COPY . .
+
+CMD ["npm", "run", "dev"]
