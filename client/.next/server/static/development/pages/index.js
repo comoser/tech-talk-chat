@@ -113,8 +113,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(socket_io_client__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var uuid_v1__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! uuid/v1 */ "uuid/v1");
 /* harmony import */ var uuid_v1__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(uuid_v1__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _hooks_chat_messages__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../hooks/chat_messages */ "./hooks/chat_messages.js");
 var _jsxFileName = "/Users/davidalecrim/Desktop/tech-talk/client/components/chat/chat_box.js";
 var __jsx = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement;
+
 
 
 
@@ -130,22 +132,17 @@ const ChatBox = () => {
     1: setSocket
   } = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(null);
   const {
-    0: message,
-    1: setMessage
+    0: draftMessage,
+    1: setDraftMessage
   } = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])('');
-  const {
-    0: messages,
-    1: setMessages
-  } = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])([]);
+  const [messages, addMessage] = Object(_hooks_chat_messages__WEBPACK_IMPORTED_MODULE_5__["default"])([]);
   Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(() => {
     const socket = socket_io_client__WEBPACK_IMPORTED_MODULE_3___default.a.connect('http://localhost:8007');
     const uuidValue = uuid_v1__WEBPACK_IMPORTED_MODULE_4___default()();
     setSocket(socket);
     setUuid(uuidValue);
     socket.on('CHAT_MESSAGE_RECEIVED', chatMessageContent => {
-      console.log(chatMessageContent);
-      setMessages([...messages, chatMessageContent.message]);
-      console.log(chatMessageContent.uuid, uuidValue);
+      addMessage(chatMessageContent.message);
 
       if (chatMessageContent.uuid === uuidValue) {
         console.log('IT WAS ME');
@@ -154,41 +151,53 @@ const ChatBox = () => {
       }
     });
   }, []);
-  Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(() => {
-    console.log(messages);
-  });
 
-  const onMessageChange = e => {
-    setMessage(e.target.value);
+  const onDraftMessageChange = e => {
+    setDraftMessage(e.target.value);
   };
 
   const sendMessage = () => {
     socket.emit('CHAT_MESSAGE_SENT', {
       uuid,
-      message
+      message: draftMessage
     });
   };
 
   return __jsx("div", {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 46
+      lineNumber: 42
     },
     __self: undefined
-  }, __jsx("input", {
-    name: "chat-message",
-    value: message,
-    onChange: onMessageChange,
+  }, __jsx("ul", {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 47
+      lineNumber: 43
+    },
+    __self: undefined
+  }, messages.map(msg => {
+    return __jsx("li", {
+      key: msg,
+      __source: {
+        fileName: _jsxFileName,
+        lineNumber: 47
+      },
+      __self: undefined
+    }, msg);
+  })), __jsx("input", {
+    name: "draft-message",
+    value: draftMessage,
+    onChange: onDraftMessageChange,
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 52
     },
     __self: undefined
   }), __jsx("button", {
     onClick: sendMessage,
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 52
+      lineNumber: 57
     },
     __self: undefined
   }, "Send Message"));
@@ -309,6 +318,36 @@ const Section = styled_components__WEBPACK_IMPORTED_MODULE_0___default.a.section
     margin-top: 80px;
     padding: 60px;
 `;
+
+/***/ }),
+
+/***/ "./hooks/chat_messages.js":
+/*!********************************!*\
+  !*** ./hooks/chat_messages.js ***!
+  \********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+
+
+function useChatMessages(initialState) {
+  const {
+    0: messages,
+    1: setMessages
+  } = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(initialState);
+
+  function addMessage(message) {
+    setMessages([...messages, message]);
+  }
+
+  return [messages, addMessage];
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (useChatMessages);
 
 /***/ }),
 

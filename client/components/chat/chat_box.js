@@ -4,11 +4,13 @@ import styled from 'styled-components';
 import socketio from 'socket.io-client';
 import uuidLib from 'uuid/v1';
 
+import useChatMessages from '../../hooks/chat_messages';
+
 export const ChatBox = () => {
     const [uuid, setUuid] = useState(null);
     const [socket, setSocket] = useState(null);
-    const [message, setMessage] = useState('');
-    const [messages, setMessages] = useState([]);
+    const [draftMessage, setDraftMessage] = useState('');
+    const [messages, addMessage] = useChatMessages([]);
 
     useEffect(() => {
         const socket = socketio.connect('http://localhost:8007');
@@ -16,9 +18,7 @@ export const ChatBox = () => {
         setSocket(socket);
         setUuid(uuidValue);
         socket.on('CHAT_MESSAGE_RECEIVED', (chatMessageContent) => {
-            console.log(chatMessageContent);
-            setMessages([...messages, chatMessageContent.message]);
-            console.log(chatMessageContent.uuid, uuidValue);
+            addMessage(chatMessageContent.message);
             if (chatMessageContent.uuid === uuidValue) {
                 console.log('IT WAS ME');
             } else {
@@ -27,27 +27,32 @@ export const ChatBox = () => {
         });
     }, []);
 
-    useEffect(() => {
-        console.log(messages);
-    });
-
-    const onMessageChange = (e) => {
-        setMessage(e.target.value);
+    const onDraftMessageChange = (e) => {
+        setDraftMessage(e.target.value);
     };
 
     const sendMessage = () => {
         socket.emit('CHAT_MESSAGE_SENT', {
             uuid,
-            message,
+            message: draftMessage,
         });
     }
 
     return (
         <div>
+            <ul>
+                {
+                    messages.map((msg) => {
+                        return (
+                            <li key={msg}>{msg}</li>
+                        );
+                    })
+                }
+            </ul>
             <input
-                name="chat-message"
-                value={message}
-                onChange={onMessageChange}
+                name="draft-message"
+                value={draftMessage}
+                onChange={onDraftMessageChange}
             />
             <button onClick={sendMessage}>
                 Send Message
