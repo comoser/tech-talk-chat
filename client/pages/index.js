@@ -1,4 +1,8 @@
+import dotenv from 'dotenv';
+
 import { Navbar, Section, ChatBox, Main } from '../components';
+
+dotenv.config();
 
 const Index = () => {
   return (

@@ -88,7 +88,7 @@ module.exports =
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -105,19 +105,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ChatBox", function() { return ChatBox; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! prop-types */ "prop-types");
-/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var styled_components__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! styled-components */ "styled-components");
-/* harmony import */ var styled_components__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(styled_components__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! socket.io-client */ "socket.io-client");
-/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(socket_io_client__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var uuid_v1__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! uuid/v1 */ "uuid/v1");
-/* harmony import */ var uuid_v1__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(uuid_v1__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _hooks_chat_messages__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../hooks/chat_messages */ "./hooks/chat_messages.js");
+/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! socket.io-client */ "socket.io-client");
+/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(socket_io_client__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var uuid_v1__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! uuid/v1 */ "uuid/v1");
+/* harmony import */ var uuid_v1__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(uuid_v1__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _hooks_chat_messages__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../hooks/chat_messages */ "./hooks/chat_messages.js");
 var _jsxFileName = "/Users/davidalecrim/Desktop/tech-talk/client/components/chat/chat_box.js";
 var __jsx = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement;
-
-
 
 
 
@@ -135,22 +129,24 @@ const ChatBox = () => {
     0: draftMessage,
     1: setDraftMessage
   } = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])('');
-  const [messages, addMessage] = Object(_hooks_chat_messages__WEBPACK_IMPORTED_MODULE_5__["default"])([]);
-  Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(() => {
-    const socket = socket_io_client__WEBPACK_IMPORTED_MODULE_3___default.a.connect('http://localhost:8007');
-    const uuidValue = uuid_v1__WEBPACK_IMPORTED_MODULE_4___default()();
-    setSocket(socket);
-    setUuid(uuidValue);
-    socket.on('CHAT_MESSAGE_RECEIVED', chatMessageContent => {
-      addMessage(chatMessageContent.message);
-
-      if (chatMessageContent.uuid === uuidValue) {
-        console.log('IT WAS ME');
-      } else {
-        console.log('NOT ME');
-      }
-    });
+  const [messages, addMessage] = Object(_hooks_chat_messages__WEBPACK_IMPORTED_MODULE_3__["default"])([]);
+  const {
+    0: messageHistory,
+    1: setMessageHistory
+  } = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])([]);
+  Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(async () => {
+    setSocket(socket_io_client__WEBPACK_IMPORTED_MODULE_1___default.a.connect("http://localhost:8007"));
+    setUuid(uuid_v1__WEBPACK_IMPORTED_MODULE_2___default()());
+    const response = await fetch(`${"http://localhost:8007"}/history`);
+    const messagesJson = await response.json();
+    setMessageHistory(messagesJson.response);
   }, []);
+
+  if (socket) {
+    socket.on('CHAT_MESSAGE_RECEIVED', chatMessageContent => {
+      addMessage(chatMessageContent);
+    });
+  }
 
   const onDraftMessageChange = e => {
     setDraftMessage(e.target.value);
@@ -163,47 +159,64 @@ const ChatBox = () => {
     });
   };
 
+  const sendMessageByKeyboard = e => {
+    if (e.which === 13) {
+      socket.emit('CHAT_MESSAGE_SENT', {
+        uuid,
+        message: draftMessage
+      });
+    }
+  };
+
   return __jsx("div", {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 42
+      lineNumber: 49
     },
     __self: undefined
   }, __jsx("ul", {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 43
+      lineNumber: 50
     },
     __self: undefined
-  }, messages.map(msg => {
+  }, messageHistory.map(item => {
     return __jsx("li", {
-      key: msg,
+      key: item.message,
       __source: {
         fileName: _jsxFileName,
-        lineNumber: 47
+        lineNumber: 54
       },
       __self: undefined
-    }, msg);
+    }, item.uuid === uuid ? 'ME: ' : '', item.message);
+  }), messages.map(messageWrapper => {
+    return __jsx("li", {
+      key: messageWrapper.message,
+      __source: {
+        fileName: _jsxFileName,
+        lineNumber: 65
+      },
+      __self: undefined
+    }, messageWrapper.uuid === uuid ? 'ME: ' : '', messageWrapper.message);
   })), __jsx("input", {
     name: "draft-message",
     value: draftMessage,
     onChange: onDraftMessageChange,
+    onKeyPress: sendMessageByKeyboard,
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 52
+      lineNumber: 74
     },
     __self: undefined
   }), __jsx("button", {
     onClick: sendMessage,
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 57
+      lineNumber: 80
     },
     __self: undefined
   }, "Send Message"));
 };
-ChatBox.propTypes = {};
-ChatBox.defaultProps = {};
 
 /***/ }),
 
@@ -362,35 +375,39 @@ function useChatMessages(initialState) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../components */ "./components/index.js");
+/* harmony import */ var dotenv__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! dotenv */ "dotenv");
+/* harmony import */ var dotenv__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(dotenv__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _components__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../components */ "./components/index.js");
 var _jsxFileName = "/Users/davidalecrim/Desktop/tech-talk/client/pages/index.js";
 
 var __jsx = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement;
 
 
+dotenv__WEBPACK_IMPORTED_MODULE_1___default.a.config();
+
 const Index = () => {
-  return __jsx(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, __jsx(_components__WEBPACK_IMPORTED_MODULE_1__["Navbar"], {
+  return __jsx(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, __jsx(_components__WEBPACK_IMPORTED_MODULE_2__["Navbar"], {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 6
+      lineNumber: 10
     },
     __self: undefined
-  }), __jsx(_components__WEBPACK_IMPORTED_MODULE_1__["Main"], {
+  }), __jsx(_components__WEBPACK_IMPORTED_MODULE_2__["Main"], {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 7
+      lineNumber: 11
     },
     __self: undefined
-  }, __jsx(_components__WEBPACK_IMPORTED_MODULE_1__["Section"], {
+  }, __jsx(_components__WEBPACK_IMPORTED_MODULE_2__["Section"], {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 8
+      lineNumber: 12
     },
     __self: undefined
-  }, __jsx(_components__WEBPACK_IMPORTED_MODULE_1__["ChatBox"], {
+  }, __jsx(_components__WEBPACK_IMPORTED_MODULE_2__["ChatBox"], {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 9
+      lineNumber: 13
     },
     __self: undefined
   }))));
@@ -400,7 +417,7 @@ const Index = () => {
 
 /***/ }),
 
-/***/ 4:
+/***/ 3:
 /*!******************************!*\
   !*** multi ./pages/index.js ***!
   \******************************/
@@ -412,14 +429,14 @@ module.exports = __webpack_require__(/*! /Users/davidalecrim/Desktop/tech-talk/c
 
 /***/ }),
 
-/***/ "prop-types":
-/*!*****************************!*\
-  !*** external "prop-types" ***!
-  \*****************************/
+/***/ "dotenv":
+/*!*************************!*\
+  !*** external "dotenv" ***!
+  \*************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = require("prop-types");
+module.exports = require("dotenv");
 
 /***/ }),
 
