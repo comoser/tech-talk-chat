@@ -128,7 +128,7 @@ const ChatBoxWrapper = styled_components__WEBPACK_IMPORTED_MODULE_3___default.a.
     width: 375px;
     height: 60vh;
     border-radius: 5px;
-    border: 1px solid #f0f0f0;
+    border: 1px solid #a3a3a3;
     top: 100px;
     left: 50%;
     transform: translate(-50%, 0);
@@ -209,9 +209,9 @@ const ChatBox = () => {
   };
 
   const renderHistoryMessages = () => {
-    return messageHistory.map(messageWrapper => {
+    return messageHistory.map((messageWrapper, index) => {
       return __jsx(_chat_item__WEBPACK_IMPORTED_MODULE_5__["ChatItem"], {
-        key: messageWrapper.message,
+        key: String(index),
         uuid: uuid,
         messageWrapper: messageWrapper,
         __source: {
@@ -224,9 +224,9 @@ const ChatBox = () => {
   };
 
   const renderMessages = () => {
-    return messages.map(messageWrapper => {
+    return messages.map((messageWrapper, index) => {
       return __jsx(_chat_item__WEBPACK_IMPORTED_MODULE_5__["ChatItem"], {
-        key: messageWrapper.message,
+        key: String(index),
         uuid: uuid,
         messageWrapper: messageWrapper,
         __source: {
@@ -292,7 +292,7 @@ const Wrapper = styled_components__WEBPACK_IMPORTED_MODULE_1___default.a.div`
   height: 40px;
   display: flex;
   flex-direction: row;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid #a3a3a3;
 `;
 const BigInput = styled_components__WEBPACK_IMPORTED_MODULE_1___default.a.input`
   flex: 1;
@@ -573,8 +573,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var dotenv__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(dotenv__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _components__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../components */ "./components/index.js");
 var _jsxFileName = "/app/client/pages/index.js";
-
 var __jsx = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement;
+
 
 
 dotenv__WEBPACK_IMPORTED_MODULE_1___default.a.config();
@@ -583,25 +583,25 @@ const Index = () => {
   return __jsx(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, __jsx(_components__WEBPACK_IMPORTED_MODULE_2__["Navbar"], {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 10
+      lineNumber: 11
     },
     __self: undefined
   }), __jsx(_components__WEBPACK_IMPORTED_MODULE_2__["Main"], {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 11
+      lineNumber: 12
     },
     __self: undefined
   }, __jsx(_components__WEBPACK_IMPORTED_MODULE_2__["Section"], {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 12
+      lineNumber: 13
     },
     __self: undefined
   }, __jsx(_components__WEBPACK_IMPORTED_MODULE_2__["ChatBox"], {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 13
+      lineNumber: 14
     },
     __self: undefined
   }))));

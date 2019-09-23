@@ -3,27 +3,21 @@ version: '3'
 services:
 
   redis-server:
+    restart: always
     image: "redis"
 
   api:
+    restart: always
     build: ./api
-    ports: 
+    ports:
       - "8007:8007"
 
-  client-a:
+  client:
+    restart: always
     build: ./client
     environment:
       - "PORT=3001"
     ports:
       - "3001:3001"
-    depends_on:
-      - api
-
-  client-b:
-    build: ./client
-    environment:
-      - "PORT=3002"
-    ports:
-      - "3002:3002"
     depends_on:
       - api

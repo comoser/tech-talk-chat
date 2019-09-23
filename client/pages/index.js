@@ -1,3 +1,4 @@
+import React from 'react';
 import dotenv from 'dotenv';
 
 import { Navbar, Section, ChatBox, Main } from '../components';

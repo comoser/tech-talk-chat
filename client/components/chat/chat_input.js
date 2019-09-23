@@ -9,7 +9,7 @@ const Wrapper = styled.div`
   height: 40px;
   display: flex;
   flex-direction: row;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid #a3a3a3;
 `;
 
 const BigInput = styled.input`

@@ -12,7 +12,7 @@ const ChatBoxWrapper = styled.div`
     width: 375px;
     height: 60vh;
     border-radius: 5px;
-    border: 1px solid #f0f0f0;
+    border: 1px solid #a3a3a3;
     top: 100px;
     left: 50%;
     transform: translate(-50%, 0);
@@ -82,10 +82,10 @@ export const ChatBox = () => {
     };
 
     const renderHistoryMessages = () => {
-        return messageHistory.map((messageWrapper) => {
+        return messageHistory.map((messageWrapper, index) => {
             return (
                 <ChatItem
-                    key={messageWrapper.message}
+                    key={String(index)}
                     uuid={uuid}
                     messageWrapper={messageWrapper}
                 />
@@ -94,10 +94,10 @@ export const ChatBox = () => {
     };
 
     const renderMessages = () => {
-        return messages.map((messageWrapper) => {
+        return messages.map((messageWrapper, index) => {
             return (
                 <ChatItem
-                    key={messageWrapper.message}
+                    key={String(index)}
                     uuid={uuid}
                     messageWrapper={messageWrapper}
                 />
