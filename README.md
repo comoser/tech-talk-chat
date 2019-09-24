@@ -9,11 +9,12 @@ The chat has real-time communication with other rooms through sockets.
 
 ```bash
 npm run dev - responsible for launching the dev environment.
-// This corresponds to a docker-compose that will spin 1 container for redis, 1 container for the API and 1 containers for the client (chat window).
+// This corresponds to a docker-compose that will spin 1 container for redis, 1 container for the API and 1 container for the client (chat window).
 // In dev the client app is setup to have HMR working. 
 
 npm run prod - responsible for launching the prod environemnt.
-// It spins the same containers as dev but for the client it spins 2 containers instead of 1 in order to test the chat window correctly.
+// It spins the same containers as dev
+// It doesn't have HMR support the client application
 ```
 
 Feel free to use the code on this repo or to contribute to it in any way.
