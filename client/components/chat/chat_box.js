@@ -32,13 +32,13 @@ export const ChatBox = () => {
     const [messageHistory, setMessageHistory] = useState([]);
 
     const fetchHistory = async () => {
-        const response = await fetch(`${process.env.API_URL}/history`);
+        const response = await fetch('/api/history');
         const messagesJson = await response.json();
         setMessageHistory(messagesJson.response);
     };
 
     useEffect(() => {
-        setSocket(socketio.connect(process.env.API_URL));
+        setSocket(socketio.connect('/'));
         setUuid(uuidLib());
         fetchHistory();
     }, []);

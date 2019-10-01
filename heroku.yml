@@ -4,7 +4,6 @@ setup:
 
 build:
   docker:
+    web: ./api/Dockerfile
     api: ./api/Dockerfile
-    web: ./client/Dockerfile
-run:
-  web: npm start
+    client: ./client/Dockerfile
