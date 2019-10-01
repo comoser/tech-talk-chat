@@ -4,6 +4,6 @@ setup:
 
 build:
   docker:
-    web: ./api/Dockerfile
+    web: ./nginx/Dockerfile
     api: ./api/Dockerfile
     client: ./client/Dockerfile
